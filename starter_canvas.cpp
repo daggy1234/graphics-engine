@@ -579,9 +579,12 @@ void MyCanvas::drawConvexPolygon(const GPoint points[], int count, const GPaint 
             if (start_x != std::numeric_limits<int>::max() && end_x != std::numeric_limits<int>::min())
             {
                 int count = end_x - start_x;
-                GPixel points[count];
-                shader->shadeRow(start_x, y, count, points);
-                blit_row_shader(start_x, y, end_x - start_x, converted, points, fDevice, kSrc);
+                if (count > 0)
+                {
+                    GPixel points[count];
+                    shader->shadeRow(start_x, y, count, points);
+                    blit_row_shader(start_x, y, end_x - start_x, converted, points, fDevice, kSrc);
+                }
             }
         }
         return;
@@ -878,7 +881,7 @@ void MyCanvas::drawQuad(const GPoint verts[4], const GColor colors[4], const GPo
     GPoint c = verts[2];
     GPoint d = verts[3];
 
-    int indices[6] = {0, 1, 2, 1, 3, 2};
+    int indices[6] = {0, 1, 3, 1, 2, 3};
     float level_inf = 1.0f / (level + 1);
 
     GPoint final_points[4];
@@ -896,48 +899,28 @@ void MyCanvas::drawQuad(const GPoint verts[4], const GColor colors[4], const GPo
             float j_a = j * level_inf;
             float j_b = (j + 1) * level_inf;
             final_points[0] = procGPoint(a, b, c, d, i_a, j_a);
-            final_points[1] = procGPoint(a, b, c, d, i_a, j_b);
-            final_points[2] = procGPoint(a, b, c, d, i_b, j_a);
-            final_points[3] = procGPoint(a, b, c, d, i_b, j_b);
+            final_points[1] = procGPoint(a, b, c, d, i_b, j_a);
+            final_points[2] = procGPoint(a, b, c, d, i_b, j_b);
+            final_points[3] = procGPoint(a, b, c, d, i_a, j_b);
 
             if (texs != NULL)
             {
                 proc_texs[0] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_a, j_a);
-                proc_texs[1] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_a, j_b);
-                proc_texs[2] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_b, j_a);
-                proc_texs[3] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_b, j_b);
+                proc_texs[1] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_b, j_a);
+                proc_texs[2] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_b, j_b);
+                proc_texs[3] = procGPoint(texs[0], texs[1], texs[2], texs[3], i_a, j_b);
                 dp = proc_texs;
             }
 
             if (colors != NULL)
             {
                 proc_colors[0] = procGCol(colors[0], colors[1], colors[2], colors[3], i_a, j_a);
-                proc_colors[1] = procGCol(colors[0], colors[1], colors[2], colors[3], i_a, j_b);
-                proc_colors[2] = procGCol(colors[0], colors[1], colors[2], colors[3], i_b, j_a);
-                proc_colors[3] = procGCol(colors[0], colors[1], colors[2], colors[3], i_b, j_b);
+                proc_colors[1] = procGCol(colors[0], colors[1], colors[2], colors[3], i_b, j_a);
+                proc_colors[2] = procGCol(colors[0], colors[1], colors[2], colors[3], i_b, j_b);
+                proc_colors[3] = procGCol(colors[0], colors[1], colors[2], colors[3], i_a, j_b);
                 cp = proc_colors;
             }
 
-            // if (colors != NULL)
-            // {
-            //     proc_colors[0] = GColor::RGBA(colors[0].a * (1 - i_a) * (1 - j_a) + colors[1].b * i_a * (1 - j_a) + colors[2].g * (1 - i_a) * j_a + colors[3].b * i_a * j_a,
-            //                                   colors[0].r * (1 - i_a) * (1 - j_a) + colors[1].r * i_a * (1 - j_a) + colors[2].r * (1 - i_a) * j_a + colors[3].r * i_a * j_a,
-            //                                   colors[0].g * (1 - i_a) * (1 - j_a) + colors[1].g * i_a * (1 - j_a) + colors[2].g * (1 - i_a) * j_a + colors[3].g * i_a * j_a,
-            //                                   colors[0].b * (1 - i_a) * (1 - j_a) + colors[1].b * i_a * (1 - j_a) + colors[2].b * (1 - i_a) * j_a + colors[3].b * i_a * j_a);
-            //     proc_colors[1] = GColor::RGBA(colors[0].a * (1 - i_b) * (1 - j_a) + colors[1].b * i_b * (1 - j_a) + colors[2].g * (1 - i_b) * j_a + colors[3].b * i_b * j_a,
-            //                                   colors[0].r * (1 - i_b) * (1 - j_a) + colors[1].r * i_b * (1 - j_a) + colors[2].r * (1 - i_b) * j_a + colors[3].r * i_b * j_a,
-            //                                   colors[0].g * (1 - i_b) * (1 - j_a) + colors[1].g * i_b * (1 - j_a) + colors[2].g * (1 - i_b) * j_a + colors[3].g * i_b * j_a,
-            //                                   colors[0].b * (1 - i_b) * (1 - j_a) + colors[1].b * i_b * (1 - j_a) + colors[2].b * (1 - i_b) * j_a + colors[3].b * i_b * j_a);
-            //     proc_colors[2] = GColor::RGBA(colors[0].a * (1 - i_b) * (1 - j_b) + colors[1].b * i_b * (1 - j_b) + colors[2].g * (1 - i_b) * j_b + colors[3].b * i_b * j_b,
-            //                                   colors[0].r * (1 - i_b) * (1 - j_b) + colors[1].r * i_b * (1 - j_b) + colors[2].r * (1 - i_b) * j_b + colors[3].r * i_b * j_b,
-            //                                   colors[0].g * (1 - i_b) * (1 - j_b) + colors[1].g * i_b * (1 - j_b) + colors[2].g * (1 - i_b) * j_b + colors[3].g * i_b * j_b,
-            //                                   colors[0].b * (1 - i_b) * (1 - j_b) + colors[1].b * i_b * (1 - j_b) + colors[2].b * (1 - i_b) * j_b + colors[3].b * i_b * j_b);
-            //     proc_colors[3] = GColor::RGBA(colors[0].a * (1 - i_a) * (1 - j_b) + colors[1].b * i_a * (1 - j_b) + colors[2].g * (1 - i_a) * j_b + colors[3].b * i_a * j_b,
-            //                                   colors[0].r * (1 - i_a) * (1 - j_b) + colors[1].r * i_a * (1 - j_b) + colors[2].r * (1 - i_a) * j_b + colors[3].r * i_a * j_b,
-            //                                   colors[0].g * (1 - i_a) * (1 - j_b) + colors[1].g * i_a * (1 - j_b) + colors[2].g * (1 - i_a) * j_b + colors[3].g * i_a * j_b,
-            //                                   colors[0].b * (1 - i_a) * (1 - j_b) + colors[1].b * i_a * (1 - j_b) + colors[2].b * (1 - i_a) * j_b + colors[3].b * i_a * j_b);
-            //     cp = proc_colors;
-            // }
             drawMesh(final_points, cp, dp, 2, indices, paint);
         }
     }
