@@ -596,9 +596,12 @@ void MyCanvas::drawConvexPolygon(const GPoint points[], int count, const GPaint 
         if (start_x != std::numeric_limits<int>::max() && end_x != std::numeric_limits<int>::min())
         {
             int count = end_x - start_x;
-            GPixel points[count];
-            shader->shadeRow(start_x, y, count, points);
-            blit_row_shader(start_x, y, end_x - start_x, converted, points, fDevice, proc);
+            if (count > 0)
+            {
+                GPixel points[count];
+                shader->shadeRow(start_x, y, count, points);
+                blit_row_shader(start_x, y, end_x - start_x, converted, points, fDevice, proc);
+            }
         }
     }
 }
