@@ -17,9 +17,9 @@
 #include <vector>
 
 #ifdef NDEBUG
-    #define GDEBUGCODE(code)
+#define GDEBUGCODE(code)
 #else
-    #define GDEBUGCODE(code)    code
+#define GDEBUGCODE(code) code
 #endif
 
 /**

@@ -27,18 +27,21 @@
  *      [0 0 1 0 0]
  *      [0 0 0 1 0]
  */
-struct GColorMatrix {
+struct GColorMatrix
+{
     std::array<float, 20> fMat;
 
     GColorMatrix() : fMat{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0} {}
     GColorMatrix(const std::array<float, 20> src) : fMat{src} {}
 
-    float operator[](unsigned i) const {
+    float operator[](unsigned i) const
+    {
         assert(i < 20);
         return fMat[i];
     }
 
-    float& operator[](unsigned i) {
+    float &operator[](unsigned i)
+    {
         assert(i < 20);
         return fMat[i];
     }
@@ -49,7 +52,8 @@ struct GColorMatrix {
  *
  * Each method has a default (do nothing) impl, so you only need to override the ones you intended to implement.
  */
-class GFinal {
+class GFinal
+{
 public:
     virtual ~GFinal() {}
 
@@ -59,7 +63,8 @@ public:
      */
     virtual std::unique_ptr<GShader> createVoronoiShader(const GPoint points[],
                                                          const GColor colors[],
-                                                         int count) {
+                                                         int count)
+    {
         return nullptr;
     }
 
@@ -68,7 +73,8 @@ public:
      *  and ending with colors[count-1] at startRadians+2pi. The colors are distributed evenly around the sweep.
      */
     virtual std::unique_ptr<GShader> createSweepGradient(GPoint center, float startRadians,
-                                                         const GColor colors[], int count) {
+                                                         const GColor colors[], int count)
+    {
         return nullptr;
     }
 
@@ -92,7 +98,8 @@ public:
     virtual std::unique_ptr<GShader> createLinearPosGradient(GPoint p0, GPoint p1,
                                                              const GColor colors[],
                                                              const float pos[],
-                                                             int count) {
+                                                             int count)
+    {
         return nullptr;
     }
 
@@ -105,8 +112,9 @@ public:
      *  Note: the resulting colors (after applying the colormatrix) may be out of bounds
      *        for color componets. If this happens they should be clamped to legal values.
      */
-    virtual std::unique_ptr<GShader> createColorMatrixShader(const GColorMatrix&,
-                                                             GShader* realShader) {
+    virtual std::unique_ptr<GShader> createColorMatrixShader(const GColorMatrix &,
+                                                             GShader *realShader)
+    {
         return nullptr;
     }
 
@@ -118,7 +126,8 @@ public:
      *
      *  Any caps or joins needed should be round (circular).
      */
-    virtual GPath strokePolygon(const GPoint[], int count, float width, bool isClosed) {
+    virtual GPath strokePolygon(const GPoint[], int count, float width, bool isClosed)
+    {
         return GPath();
     }
 
@@ -149,8 +158,8 @@ public:
      *
      *      Corners is computed by our standard "drawQuad" evaluation using the 4 corners 0,2,4,6
      */
-    virtual void drawQuadraticCoons(GCanvas*, const GPoint pts[8], const GPoint tex[4],
-                                    int level, const GPaint&) {}
+    virtual void drawQuadraticCoons(GCanvas *, const GPoint pts[8], const GPoint tex[4],
+                                    int level, const GPaint &) {}
 };
 
 /**
