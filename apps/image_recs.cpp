@@ -10,6 +10,7 @@
 #include "image_pa4.cpp"
 #include "image_pa5.cpp"
 #include "image_pa6.cpp"
+#include "image_final.cpp"
 
 const GDrawRec gDrawRecs[] = {
     { draw_solid_ramp,  256, 7*28,  "solid_ramp",   1   },

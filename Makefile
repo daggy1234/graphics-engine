@@ -35,5 +35,5 @@ draw: $(G_DEPS)
 	$(CC_RELEASE) $(G_INC) $(G_SRC) $(G_LINK) $(DRAW_SRC) -lSDL2 -o draw
 
 clean:
-	@rm -rf image tests bench dbench draw pa?_*.png *.dSYM *.exe
+	@rm -rf image tests bench dbench draw pa?_*.png final?_*.png *.dSYM *.exe
 
