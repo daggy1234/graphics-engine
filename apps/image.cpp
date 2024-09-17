@@ -50,7 +50,7 @@ static double compare(const GBitmap& a, const GBitmap& b, int tolerance, bool ve
     assert(score >= 0 && score <= 1);
     score *= score;
     if (verbose) {
-        printf(" score %3d", (int)(score * 100));
+        printf("  %3d", (int)(score * 100));
     }
     return score;
 }
@@ -129,6 +129,42 @@ static void add_diff_to_file(FILE* f, const GBitmap& test, const GBitmap& orig, 
     add_image(f, path, name, "dif1", diff1); fprintf(f, "<br><br>\n");
 }
 
+static void handle_something(FILE* f, std::string prefix, const char dir[], int index) {
+    GBitmap bitmap;
+    bitmap.alloc(256, 256);
+    auto canvas = GCreateCanvas(bitmap);
+    if (canvas) {
+        std::string title = GDrawSomething(canvas.get(), {256, 256});
+        std::string filename = prefix + "something.png";
+        bitmap.writeToFile(filename.c_str());
+        printf("Title: '%s'\n", title.c_str());
+
+        if (f) {
+            char name[200];
+            snprintf(name, sizeof(name), "%d.png", index);
+            char path[250];
+            snprintf(path, sizeof(path), "%s/%s", dir, name);
+            bitmap.writeToFile(path);
+
+            const char style[] = "font-size:18px;text-align:center";
+
+            if ((index % 4) == 0) {
+                fprintf(f, "<tr>\n");
+            }
+
+            fprintf(f, "<td>");
+            fprintf(f, "<p style='%s'>%s</p> ", style, title.c_str());
+            fprintf(f, "<img src=\"%s\" />", name);
+            fprintf(f, "</td>\n");
+
+            if ((index % 4) == 3) {
+                fprintf(f, "</tr>\n");
+            }
+            fclose(f);
+        }
+    }
+}
+
 static int gPACounts[10] = { 0,0,0,0,0,0,0,0,0,0 };
 static int gDrawCount;
 
@@ -140,6 +176,19 @@ static int max_name_len() {
     return (int)len;
 }
 
+static int max_pa_num() {
+    int num = 0;
+    for (int i = 0; gDrawRecs[i].fDraw; ++i) {
+        num = std::max(num, gDrawRecs[i].fPA);
+    }
+    return num;
+}
+
+static std::string make_image_prefix(int pa) {
+    std::string prefix = "pa";
+    return prefix + std::to_string(pa) + "_";
+}
+
 int main_image(int argc, const char* argv[]) {
     bool verbose = false;
     std::string root;
@@ -149,6 +198,7 @@ int main_image(int argc, const char* argv[]) {
     const char* scoreFile = nullptr;
     FILE* diffFile = NULL;
     int tolerance = 0;
+    bool append_pa_prefix = true;
 
     const char* collage_dir = nullptr;
     int collage_index = -1;
@@ -164,6 +214,7 @@ int main_image(int argc, const char* argv[]) {
         if (is_arg(argv[i], "verbose")) {
             verbose = true;
         } else if (is_arg(argv[i], "write") && i+1 < argc) {
+            append_pa_prefix = false;
             root = argv[++i];
         } else if (is_arg(argv[i], "match") && i+1 < argc) {
             match = argv[++i];
@@ -198,19 +249,25 @@ int main_image(int argc, const char* argv[]) {
         }
     }
 
+    if (!match) {
+        auto prefix = make_image_prefix(max_pa_num());
+        handle_something(collage_file, prefix, collage_dir, collage_index);
+    }
+
     // pa#_NAME.png -- so add 8 to the name length for the total
     const int maxNameLen = max_name_len() + 8;
 
     double percent_correct = 0;
     double counter = 0;
-    int numImages = 0;
     for (int i = 0; gDrawRecs[i].fDraw; ++i) {
-        numImages += 1;
-
         double weight = 1 << (gDrawRecs[i].fPA - 1);
         weight /= gPACounts[gDrawRecs[i].fPA];
 
         std::string path(root);
+        // we add a prefix to make it easy for 'make clean' to remove these, but not other images
+        if (append_pa_prefix) {
+            path += make_image_prefix(gDrawRecs[i].fPA);
+        }
         path += gDrawRecs[i].fName;
         path += ".png";
 
@@ -260,19 +317,9 @@ int main_image(int argc, const char* argv[]) {
         fclose(diffFile);
     }
 
-    constexpr double num_required = 2;
-
-    double dscore = percent_correct * 100 / counter;
-
-    int raw_image_score = (int)(dscore * numImages / num_required + 0.5);
-    int image_score = std::min(raw_image_score, 100);
-
+    int image_score = (int)(percent_correct * 100 / counter + 0.5);
     if (expected) {
-        printf("          final: %3d", image_score);
-        if (raw_image_score > image_score) {
-            printf(" [%d]", raw_image_score);
-        }
-        printf("\n");
+        printf("           image: %d\n", image_score);
     }
     if (scoreFile) {
         FILE* f = fopen(scoreFile, "w");
