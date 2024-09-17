@@ -1,4 +1,4 @@
-#include "include/GPath.h"
+#include "../include/GPath.h"
 #include <cmath>
 
 // Append a rectangle to the path

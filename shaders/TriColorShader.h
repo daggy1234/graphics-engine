@@ -1,6 +1,6 @@
-#include "include/GShader.h"
-#include "include/GBitmap.h"
-#include "include/GMatrix.h"
+#include "../include/GShader.h"
+#include "../include/GBitmap.h"
+#include "../include/GMatrix.h"
 
 static inline GPixel convert_to_pix(const GColor &color)
 {

@@ -1,6 +1,6 @@
-#include "include/GShader.h"
-#include "include/GBitmap.h"
-#include "include/GMatrix.h"
+#include "../include/GShader.h"
+#include "../include/GBitmap.h"
+#include "../include/GMatrix.h"
 
 class TriangleCombined : public GShader
 {

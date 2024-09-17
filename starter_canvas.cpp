@@ -5,14 +5,14 @@
 #include "iostream"
 #include <map>
 #include "include/GShader.h"
-#include "GPath.h"
+#include "utils/GPath.h"
 #include <cassert>
-#include "GColorMod.h"
-#include "BitmapShader.h"
-#include "LinearGradient.h"
-#include "TriTextureShader.h"
-#include "TriColorShader.h"
-#include "TriCombined.h"
+#include "utils/GColorMod.h"
+#include "shaders/BitmapShader.h"
+#include "shaders/LinearGradient.h"
+#include "shaders/TriTextureShader.h"
+#include "shaders/TriColorShader.h"
+#include "shaders/TriCombined.h"
 
 typedef GPixel (*BlendProc)(GColorMod, GColorMod);
 typedef void (*BlendProcE)(int, int, int, GColorMod, GBitmap);

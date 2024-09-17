@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/GPixel.h"
+#include "../include/GPixel.h"
 
 struct GColorMod
 {

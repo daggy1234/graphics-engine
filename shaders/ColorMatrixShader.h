@@ -1,9 +1,9 @@
-#include "include/GShader.h"
-#include "include/GBitmap.h"
-#include "include/GMatrix.h"
-#include "include/GColor.h"
-#include "include/GFinal.h"
-#include "GColorMod.h"
+#include "../include/GShader.h"
+#include "../include/GBitmap.h"
+#include "../include/GMatrix.h"
+#include "../include/GColor.h"
+#include "../include/GFinal.h"
+#include "../utils/GColorMod.h"
 
 static inline GPixel convert_pixc(const GColor &color)
 {
